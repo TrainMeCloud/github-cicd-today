@@ -1,0 +1,74 @@
+name: ADF Build
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+
+  build-adf:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install ADF utilities
+        run: npm install
+
+      - name: Generate ARM template
+        run: |
+          npm run build export "$GITHUB_WORKSPACE" "/subscriptions/bd757ba0-b2a9-4905-9f83-8962401b5356/resourceGroups/today/providers/Microsoft.DataFactory/factories/cicd-dev-today" arm-template
+
+      - name: Upload ARM template
+        uses: actions/upload-artifact@v4
+        with:
+          name: adf-arm-template
+          path: arm-template/
+
+
+  deploy-adf:
+
+    needs: build-adf
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+
+      - name: Download ARM template
+        uses: actions/download-artifact@v4
+        with:
+          name: adf-arm-template
+          path: arm-template
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy ADF ARM template
+        uses: azure/arm-deploy@v2
+        with:
+          resourceGroupName: cicd
+          subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          template: arm-template/ARMTemplateForFactory.json
+          parameters: >
+            arm-template/ARMTemplateParametersForFactory.json
+            factoryName=cicd-prd-today
