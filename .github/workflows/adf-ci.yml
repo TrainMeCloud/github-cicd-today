@@ -32,4 +32,4 @@ jobs:
 
       - name: Validate ADF
         run: |
-          npm run build validate . "/subscriptions/bd757ba0-b2a9-4905-9f83-8962401b5356/resourceGroups/monitor/providers/Microsoft.DataFactory/factories/continous"
+          npm run build validate . "/subscriptions/bd757ba0-b2a9-4905-9f83-8962401b5356/resourceGroups/today/providers/Microsoft.DataFactory/factories/cicd-dev-today"
