@@ -1,0 +1,35 @@
+name: ADF CI
+
+on:
+  pull_request:
+    branches:
+      - main
+permissions:
+  id-token: write
+  contents: read      
+
+jobs:
+  validate-adf:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install ADF utilities
+        run: npm install
+
+      - name: Validate JSON syntax
+        run: |
+          find pipeline factory -name "*.json" -print0 | xargs -0 -n1 jq empty
+
+      - name: Validate ADF
+        run: |
+          npm run build validate . "/subscriptions/bd757ba0-b2a9-4905-9f83-8962401b5356/resourceGroups/monitor/providers/Microsoft.DataFactory/factories/continous"
