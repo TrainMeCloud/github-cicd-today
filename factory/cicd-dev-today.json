@@ -1,0 +1,15 @@
+{
+	"name": "cicd-dev-today",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "35cee95e-37ef-44dc-bf60-8a2feffc433b",
+		"tenantId": "7f210008-35f1-45bd-9b4a-04cc753749fc"
+	}
+}
